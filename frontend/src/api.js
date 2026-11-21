@@ -1,8 +1,14 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
+console.log("Backend URL:", API_BASE_URL);
+
 export const getSampleDataset = async () => {
     const response = await fetch(`${API_BASE_URL}/dataset/sample`);
-    if (!response.ok) throw new Error("Failed to fetch dataset");
+
+    if (!response.ok) {
+        throw new Error(`Dataset Error: ${response.status}`);
+    }
+
     return response.json();
 };
 
@@ -16,7 +22,7 @@ export const predictFast = async (data) => {
     });
 
     if (!response.ok) {
-        throw new Error("Fast prediction failed");
+        throw new Error(`Prediction Error: ${response.status}`);
     }
 
     return response.json();
@@ -32,7 +38,7 @@ export const predictPolicy = async (data) => {
     });
 
     if (!response.ok) {
-        throw new Error("Policy prediction failed");
+        throw new Error(`Policy Error: ${response.status}`);
     }
 
     return response.json();
@@ -40,5 +46,10 @@ export const predictPolicy = async (data) => {
 
 export const checkBackend = async () => {
     const response = await fetch(`${API_BASE_URL}/health`);
+
+    if (!response.ok) {
+        throw new Error("Backend connection failed");
+    }
+
     return response.json();
 };
