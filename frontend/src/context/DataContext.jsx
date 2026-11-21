@@ -24,7 +24,7 @@ export function DataProvider({ children }) {
       
       let url = `${import.meta.env.VITE_API_URL}/dataset/sample`;
       if (stationFilter && typeof stationFilter === 'string') {
-        url += `?station=${stationFilter}`;
+        url += `?station=${encodeURIComponent(stationFilter)}`;
       }
       
       const res = await axios.get(url);
