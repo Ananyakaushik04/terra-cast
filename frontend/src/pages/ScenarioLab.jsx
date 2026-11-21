@@ -4,7 +4,9 @@ import axios from 'axios';
 import { Activity, AlertTriangle } from 'lucide-react';
 import { DataContext } from '../context/DataContext';
 
-const API_FAST = "http://localhost:8000/predict/fast";
+const API_BASE_URL = import.meta.env.VITE_API_URL?.replace(/\/+$/, "");
+const API_FAST = `${API_BASE_URL}/predict/fast`;
+const API_POLICY = `${API_BASE_URL}/predict/policy`;
 
 export default function ScenarioLab() {
   const { params, setParams } = useContext(DataContext);
@@ -39,7 +41,7 @@ export default function ScenarioLab() {
   const { data: policyData, isFetching: policyFetching, isError: policyIsError, error: policyError } = useQuery({
     queryKey: ['predict_policy', policyParams],
     queryFn: async () => {
-      const response = await axios.post("http://localhost:8000/predict/policy", policyParams);
+      const response = await axios.post(API_POLICY, policyParams);
       return response.data;
     },
     staleTime: Infinity,
