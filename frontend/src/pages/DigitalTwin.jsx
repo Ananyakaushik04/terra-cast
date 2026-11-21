@@ -5,7 +5,8 @@ import { Cloud, Wind, Droplets, Eye, Activity, BarChart2, AlertTriangle } from '
 import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { DataContext } from '../context/DataContext';
 
-const API_FAST = "http://localhost:8000/predict/fast";
+const API_BASE_URL = import.meta.env.VITE_API_URL?.replace(/\/+$/, "");
+const API_FAST = `${API_BASE_URL}/predict/fast`;
 
 const TrendGraph = ({ data, color, dataKey, gradientId }) => (
   <div className="h-[140px] w-full mt-4">
