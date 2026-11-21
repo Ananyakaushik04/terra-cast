@@ -22,7 +22,7 @@ export function DataProvider({ children }) {
         setStationName(`Loading random station...`);
       }
       
-      let url = "http://localhost:8000/dataset/sample";
+      let url = `${import.meta.env.VITE_API_URL}/dataset/sample`;
       if (stationFilter && typeof stationFilter === 'string') {
         url += `?station=${stationFilter}`;
       }
