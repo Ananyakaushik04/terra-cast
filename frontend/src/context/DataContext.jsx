@@ -1,5 +1,4 @@
-```jsx
-import React, { createContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 export const DataContext = createContext();
@@ -28,51 +27,46 @@ export function DataProvider({ children }) {
   const [dataTimestamp, setDataTimestamp] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  const API_URL = import.meta.env.VITE_API_URL;
-
   const loadRealData = async (stationFilter = null) => {
     try {
       setIsLoading(true);
 
+      const API_URL = import.meta.env.VITE_API_URL;
+
       if (!API_URL) {
-        throw new Error("VITE_API_URL environment variable is missing.");
+        throw new Error("VITE_API_URL is missing");
       }
 
-      if (typeof stationFilter === 'string') {
-        setStationName(`Loading ${stationFilter}...`);
+      if (typeof stationFilter === "string") {
+        setStationName("Loading " + stationFilter + "...");
       } else {
         setStationName("Loading random station...");
       }
 
-      // Backend API URL
-      const url = `${API_URL.replace(/\/+$/, '')}/dataset/sample`;
+      const url = API_URL.replace(/\/+$/, "") + "/dataset/sample";
 
-      // Add station filter only when selected
       const response = await axios.get(url, {
-        params: stationFilter && typeof stationFilter === 'string'
+        params: stationFilter
           ? { station: stationFilter }
           : {}
       });
 
       const data = response.data;
 
-      // Update application data
       setParams(data);
-
       setStationName(data.station || "Unknown Station");
 
-      // Format timestamp
-      if (data.year && data.month && data.day !== undefined && data.hour !== undefined) {
-        const timestamp = `${data.year}-${String(data.month).padStart(2, '0')}-${String(data.day).padStart(2, '0')} ${String(data.hour).padStart(2, '0')}:00`;
+      const timestamp =
+        data.year +
+        "-" + String(data.month).padStart(2, "0") +
+        "-" + String(data.day).padStart(2, "0") +
+        " " + String(data.hour).padStart(2, "0") +
+        ":00";
 
-        setDataTimestamp(timestamp);
-      } else {
-        setDataTimestamp("");
-      }
+      setDataTimestamp(timestamp);
 
     } catch (error) {
       console.error("Failed to load real data:", error);
-
       setStationName("Unable to load station");
 
     } finally {
@@ -80,31 +74,18 @@ export function DataProvider({ children }) {
     }
   };
 
-  const isMounted = useRef(false);
-
   useEffect(() => {
-    if (!isMounted.current) {
-      isMounted.current = true;
-      loadRealData();
-    }
+    loadRealData();
 
-    // Listen for station selection events from Header
     const handleLoadStation = (event) => {
       loadRealData(event.detail);
     };
 
-    window.addEventListener(
-      'terracast:load_station',
-      handleLoadStation
-    );
+    window.addEventListener("terracast:load_station", handleLoadStation);
 
     return () => {
-      window.removeEventListener(
-        'terracast:load_station',
-        handleLoadStation
-      );
+      window.removeEventListener("terracast:load_station", handleLoadStation);
     };
-
   }, []);
 
   return (
@@ -122,4 +103,3 @@ export function DataProvider({ children }) {
     </DataContext.Provider>
   );
 }
-```
