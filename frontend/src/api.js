@@ -1,55 +1,64 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-console.log("Backend URL:", API_BASE_URL);
+const API_BASE_URL = import.meta.env.VITE_API_URL?.replace(/\/+$/, "");
 
-export const getSampleDataset = async () => {
-    const response = await fetch(`${API_BASE_URL}/dataset/sample`);
+console.log("TerraCast Backend URL:", API_BASE_URL);
+
+// Check backend URL configuration
+if (!API_BASE_URL) {
+    console.error("VITE_API_URL is missing. Check Vercel Environment Variables.");
+}
+
+// Common API request handler
+const apiRequest = async (endpoint, options = {}) => {
+    if (!API_BASE_URL) {
+        throw new Error("Backend URL is not configured.");
+    }
+
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        ...options,
+        headers: {
+            "Content-Type": "application/json",
+            ...options.headers
+        }
+    });
 
     if (!response.ok) {
-        throw new Error(`Dataset Error: ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(
+            `API Error ${response.status}: ${errorText}`
+        );
     }
 
     return response.json();
 };
 
+// Get sample dataset
+export const getSampleDataset = async (station = null) => {
+    const query = station
+        ? `?station=${encodeURIComponent(station)}`
+        : "";
+
+    return apiRequest(`/dataset/sample${query}`);
+};
+
+// Fast AQI prediction
 export const predictFast = async (data) => {
-    const response = await fetch(`${API_BASE_URL}/predict/fast`, {
+    return apiRequest("/predict/fast", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
         body: JSON.stringify(data)
     });
-
-    if (!response.ok) {
-        throw new Error(`Prediction Error: ${response.status}`);
-    }
-
-    return response.json();
 };
 
+// Policy prediction
 export const predictPolicy = async (data) => {
-    const response = await fetch(`${API_BASE_URL}/predict/policy`, {
+    return apiRequest("/predict/policy", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
         body: JSON.stringify(data)
     });
-
-    if (!response.ok) {
-        throw new Error(`Policy Error: ${response.status}`);
-    }
-
-    return response.json();
 };
 
+// Check backend health
 export const checkBackend = async () => {
-    const response = await fetch(`${API_BASE_URL}/health`);
-
-    if (!response.ok) {
-        throw new Error("Backend connection failed");
-    }
-
-    return response.json();
+    return apiRequest("/health");
 };
+
