@@ -4,10 +4,12 @@ from app.api.routes import router
 
 app = FastAPI(title="TerraCast AI Engine")
 
-# Enable CORS for the React frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://terra-cast-gamma.vercel.app",
+        "http://localhost:5173"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
