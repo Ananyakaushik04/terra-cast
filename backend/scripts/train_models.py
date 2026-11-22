@@ -7,9 +7,17 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, accuracy_score, f1_score
 
-dataset_dir = r"C:\Users\shash\.gemini\antigravity\scratch\TerraCast\backend\dataset"
-models_dir = r"C:\Users\shash\.gemini\antigravity\scratch\TerraCast\backend\models"
+from pathlib import Path
+
+# Dynamically locate backend directory
+BASE_DIR = Path(__file__).resolve().parents[1]
+
+# Dataset and model directories
+dataset_dir = BASE_DIR / "dataset"
+models_dir = BASE_DIR / "models"
+
 os.makedirs(models_dir, exist_ok=True)
+
 
 csv_path = os.path.join(dataset_dir, "beijing_aqi_merged.csv")
 print("Loading merged dataset...")
