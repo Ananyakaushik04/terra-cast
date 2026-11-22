@@ -8,7 +8,7 @@ class ModelService:
     def __init__(self):
 
         # Dynamically locate backend directory
-        BASE_DIR = Path(__file__).resolve().parents[2]
+        BASE_DIR = Path(__file__).resolve().parents[3]
 
         # Model directory
         models_dir = BASE_DIR / "models"
