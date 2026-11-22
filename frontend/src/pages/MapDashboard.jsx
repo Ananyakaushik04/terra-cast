@@ -11,7 +11,8 @@ export default function MapDashboard() {
   useEffect(() => {
     const fetchMlData = async () => {
       try {
-        const mlRes = await axios.post("http://localhost:8000/predict/fast", params);
+        const API_BASE = import.meta.env.VITE_API_URL || "https://onrender.com";
+        const mlRes = await axios.post(`${API_BASE}/predict/fast`, params);
         setMlData(mlRes.data);
       } catch (err) {
         console.error("Failed to fetch ML data", err);
