@@ -19,7 +19,14 @@ models_dir = BASE_DIR / "models"
 os.makedirs(models_dir, exist_ok=True)
 
 
-csv_path = os.path.join(dataset_dir, "beijing_aqi_merged.csv")
+csv_path = dataset_dir / "beijing_aqi_merged.csv"
+
+print("Dataset path:", csv_path)
+print("Dataset exists:", csv_path.exists())
+
+if not csv_path.exists():
+    raise FileNotFoundError(f"Dataset not found at: {csv_path}")
+
 print("Loading merged dataset...")
 df = pd.read_csv(csv_path)
 
@@ -89,6 +96,6 @@ print(f"F1 Score: {f1_score(yc_test, yc_pred, average='weighted'):.2f}")
 
 # 4. Save Models
 print("\nSaving models...")
-joblib.dump(reg_model, os.path.join(models_dir, "xgboost_regression.pkl"))
-joblib.dump(cls_model, os.path.join(models_dir, "rf_classification.pkl"))
+joblib.dump(reg_model, models_dir / "xgboost_regression.pkl")
+joblib.dump(cls_model, models_dir / "rf_classification.pkl")
 print("Model training complete and saved to backend/models/")
