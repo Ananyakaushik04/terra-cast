@@ -2,15 +2,16 @@ import os
 from pathlib import Path
 
 # Backend directory
-BASE_DIR = Path(__file__).resolve().parents[1]
+BASE_DIR = Path(__file__).resolve().parents[2]
 
 # Dataset directory
 DATASET_DIR = BASE_DIR / "dataset"
 
-# CSV file
+# Dataset file
 DATASET_PATH = DATASET_DIR / "beijing_aqi_merged.csv"
 
-# Load .env file if available
+
+# Load environment variables from .env if available
 env_path = BASE_DIR / ".env"
 
 if env_path.exists():
@@ -20,6 +21,7 @@ if env_path.exists():
 
             if line and not line.startswith("#") and "=" in line:
                 key, val = line.split("=", 1)
+
                 os.environ.setdefault(
                     key.strip(),
                     val.strip().strip('"').strip("'")
@@ -27,6 +29,7 @@ if env_path.exists():
 
 
 class Settings:
+
     PROJECT_NAME = "TerraCast AI Engine"
 
     GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
