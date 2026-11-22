@@ -2,43 +2,61 @@ import os
 import zipfile
 import pandas as pd
 import glob
+from pathlib import Path
 
-dataset_dir = r"C:\Users\shash\.gemini\antigravity\scratch\TerraCast\backend\dataset"
-nested_zip = os.path.join(dataset_dir, "PRSA2017_Data_20130301-20170228.zip")
-extract_folder = os.path.join(dataset_dir, "PRSA_Data_20130301-20170228")
-output_csv = os.path.join(dataset_dir, "beijing_aqi_merged.csv")
+# Dynamically locate backend directory
+BASE_DIR = Path(__file__).resolve().parents[1]
 
-# 1. Extract the nested zip if not already extracted
-if os.path.exists(nested_zip) and not os.path.exists(extract_folder):
+# Dataset paths
+dataset_dir = BASE_DIR / "dataset"
+nested_zip = dataset_dir / "PRSA2017_Data_20130301-20170228.zip"
+extract_folder = dataset_dir / "PRSA_Data_20130301-20170228"
+output_csv = dataset_dir / "beijing_aqi_merged.csv"
+
+# Create dataset directory if missing
+dataset_dir.mkdir(parents=True, exist_ok=True)
+
+# 1. Extract nested ZIP if needed
+if nested_zip.exists() and not extract_folder.exists():
     print("Extracting nested zip...")
+
     with zipfile.ZipFile(nested_zip, 'r') as zip_ref:
         zip_ref.extractall(dataset_dir)
+
     print("Extraction complete.")
 
-# 2. Merge all 12 station CSV files
+# 2. Locate station CSV files
 print("Locating station CSV files...")
-csv_files = glob.glob(os.path.join(extract_folder, "*.csv"))
+
+csv_files = glob.glob(str(extract_folder / "*.csv"))
 
 if not csv_files:
-    print("No CSV files found! Please check extraction.")
-    exit(1)
+    raise FileNotFoundError(
+        f"No station CSV files found in {extract_folder}"
+    )
 
 print(f"Found {len(csv_files)} station files. Merging...")
+
 dfs = []
+
 for file in csv_files:
     df = pd.read_csv(file)
     dfs.append(df)
 
 merged_df = pd.concat(dfs, ignore_index=True)
+
 print(f"Merged dataset shape: {merged_df.shape}")
 
-# 3. Basic Data Cleaning (Handling Missing Values)
+# 3. Handle missing values
 print("Handling missing values...")
-# Forward fill for time-series data makes sense for meteorological/pollution gaps
-merged_df.ffill(inplace=True)
-merged_df.bfill(inplace=True) # Catch any remaining NaNs at the very beginning
 
-# 4. Save the cleaned dataset
+merged_df.ffill(inplace=True)
+merged_df.bfill(inplace=True)
+
+# 4. Save merged dataset
 print(f"Saving merged dataset to {output_csv}...")
+
 merged_df.to_csv(output_csv, index=False)
+
 print("Data preprocessing complete!")
+print(f"Dataset saved successfully: {output_csv}")
