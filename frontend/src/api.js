@@ -1,4 +1,3 @@
-
 const API_BASE_URL = import.meta.env.VITE_API_URL?.replace(/\/+$/, "");
 
 console.log("TerraCast Backend URL:", API_BASE_URL);
@@ -24,6 +23,7 @@ const apiRequest = async (endpoint, options = {}) => {
 
     if (!response.ok) {
         const errorText = await response.text();
+
         throw new Error(
             `API Error ${response.status}: ${errorText}`
         );
